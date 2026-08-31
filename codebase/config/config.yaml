@@ -1,0 +1,41 @@
+project:
+  name: "ai-log-anomaly-detection"
+  version: "1.0.0"
+
+paths:
+  data_dir: "data"
+  artifacts_dir: "artifacts"
+  raw_data: "data/logs.csv"
+  embeddings: "artifacts/embeddings.npy"
+  detector: "artifacts/detector.joblib"
+  metadata: "artifacts/metadata.csv"
+
+data:
+  n_samples: 6000
+  anomaly_ratio: 0.12
+  random_seed: 42
+  test_size: 0.25
+
+embedding:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  batch_size: 64
+  device: "cuda"
+  normalize: true
+
+detector:
+  method: "isolation_forest"   # isolation_forest | lof | one_class_svm
+  contamination: 0.12
+  n_estimators: 200
+  n_neighbors: 20
+  random_state: 42
+
+preprocessing:
+  max_text_length: 1000
+  remove_timestamps: true
+  remove_ids: true
+  remove_hex: true
+
+gradio:
+  title: "NLP Log Anomaly Detector"
+  description: "Paste a log line to get an anomaly score and decision."
+  share: false

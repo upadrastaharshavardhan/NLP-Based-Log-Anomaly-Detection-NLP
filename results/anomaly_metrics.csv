@@ -1,0 +1,7 @@
+Metric,Value
+Accuracy,0.9620
+F1_anomaly,0.912
+ROC_AUC,0.968
+Average_Precision,0.941
+Precision_anomaly,0.905
+Recall_anomaly,0.920
