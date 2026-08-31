@@ -1,0 +1,1675 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>NLP-Based Log Anomaly Detection | Research Project 4</title>
+
+<meta
+name="description"
+content="Research Project 4 — NLP-Based Log Anomaly Detection using natural language processing and machine learning."
+
+>
+
+<meta
+name="keywords"
+content="NLP, Log Anomaly Detection, Machine Learning, Log Mining, AIOps, Python, Research"
+
+>
+
+  <meta name="author" content="Upadrasta Harsha Vardhan">
+
+  <meta name="theme-color" content="#070b14">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background: #070b14;
+      color: #e8edf7;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .page {
+      min-height: 100vh;
+    }
+
+    /* =========================
+       BACKGROUND
+    ========================= */
+
+    .background {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .background::before {
+      content: "";
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      top: -300px;
+      left: -200px;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(91, 92, 255, 0.22),
+          transparent 65%
+        );
+
+      filter: blur(30px);
+    }
+
+    .background::after {
+      content: "";
+      position: absolute;
+      width: 700px;
+      height: 700px;
+      right: -250px;
+      bottom: -300px;
+
+      background:
+        radial-gradient(
+          circle,
+          rgba(0, 214, 201, 0.15),
+          transparent 65%
+        );
+
+      filter: blur(30px);
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+
+      background-image:
+        linear-gradient(
+          rgba(255,255,255,0.025) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,0.025) 1px,
+          transparent 1px
+        );
+
+      background-size: 50px 50px;
+
+      mask-image: linear-gradient(
+        to bottom,
+        black,
+        transparent 80%
+      );
+    }
+
+    /* =========================
+       NAVIGATION
+    ========================= */
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+
+      backdrop-filter: blur(18px);
+
+      background: rgba(7, 11, 20, 0.78);
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.07);
+    }
+
+    .nav-inner {
+      max-width: 1180px;
+      margin: auto;
+
+      min-height: 72px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      padding: 0 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 11px;
+
+      background:
+        linear-gradient(
+          135deg,
+          #6d5dfc,
+          #00c9bd
+        );
+
+      box-shadow:
+        0 0 30px rgba(109, 93, 252, 0.3);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 26px;
+
+      color: #a9b3c8;
+      font-size: 14px;
+    }
+
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+
+    /* =========================
+       CONTAINER
+    ========================= */
+
+    .container {
+      max-width: 1180px;
+      margin: auto;
+      padding: 0 24px;
+    }
+
+    /* =========================
+       HERO
+    ========================= */
+
+    .hero {
+      min-height: 720px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 110px 0 90px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+
+      gap: 70px;
+
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+
+      padding: 7px 13px;
+
+      border:
+        1px solid rgba(120,120,255,0.25);
+
+      border-radius: 999px;
+
+      color: #b9b6ff;
+
+      background:
+        rgba(109,93,252,0.08);
+
+      font-size: 12px;
+      font-weight: 700;
+
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .pulse {
+      width: 7px;
+      height: 7px;
+
+      border-radius: 50%;
+
+      background: #54e6c1;
+
+      box-shadow:
+        0 0 12px #54e6c1;
+    }
+
+    h1 {
+      margin-top: 25px;
+
+      font-size:
+        clamp(46px, 7vw, 82px);
+
+      line-height: 0.98;
+
+      letter-spacing: -0.055em;
+
+      max-width: 800px;
+    }
+
+    .gradient-text {
+      background:
+        linear-gradient(
+          120deg,
+          #ffffff 10%,
+          #aaa4ff 45%,
+          #66eadb 90%
+        );
+
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      color: transparent;
+    }
+
+    .hero-description {
+      margin-top: 28px;
+
+      max-width: 690px;
+
+      color: #aeb8cc;
+
+      font-size: 18px;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 14px;
+
+      margin-top: 36px;
+
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 13px 20px;
+
+      border-radius: 12px;
+
+      font-weight: 700;
+
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background:
+        linear-gradient(
+          135deg,
+          #6d5dfc,
+          #4d7cff
+        );
+
+      box-shadow:
+        0 15px 40px rgba(88, 92, 255, 0.22);
+    }
+
+    .btn-secondary {
+      border:
+        1px solid rgba(255,255,255,0.1);
+
+      background:
+        rgba(255,255,255,0.035);
+
+      color: #dce4f3;
+    }
+
+    /* =========================
+       HERO TERMINAL
+    ========================= */
+
+    .terminal {
+      border:
+        1px solid rgba(255,255,255,0.09);
+
+      border-radius: 20px;
+
+      overflow: hidden;
+
+      background:
+        rgba(12, 17, 29, 0.85);
+
+      box-shadow:
+        0 30px 90px rgba(0,0,0,0.35);
+
+      transform: perspective(1000px) rotateY(-4deg);
+
+      transition: transform 0.4s ease;
+    }
+
+    .terminal:hover {
+      transform:
+        perspective(1000px)
+        rotateY(0deg)
+        translateY(-5px);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+
+      padding: 14px 17px;
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.07);
+
+      background:
+        rgba(255,255,255,0.025);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+
+      border-radius: 50%;
+
+      background: #555d70;
+    }
+
+    .terminal-title {
+      margin-left: 8px;
+
+      font-size: 12px;
+
+      color: #737e94;
+    }
+
+    .terminal-body {
+      padding: 25px;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+
+      font-size: 13px;
+
+      color: #aebbd1;
+    }
+
+    .code-line {
+      margin: 10px 0;
+    }
+
+    .code-command {
+      color: #77e6d6;
+    }
+
+    .code-highlight {
+      color: #a99cff;
+    }
+
+    .code-success {
+      color: #72e1a7;
+    }
+
+    /* =========================
+       METRICS
+    ========================= */
+
+    .metrics {
+      padding: 30px 0 110px;
+    }
+
+    .metric-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 16px;
+    }
+
+    .metric {
+      padding: 25px;
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius: 18px;
+
+      background:
+        rgba(255,255,255,0.035);
+
+      transition:
+        transform 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    .metric:hover {
+      transform: translateY(-5px);
+
+      border-color:
+        rgba(130,130,255,0.3);
+    }
+
+    .metric-value {
+      font-size: 35px;
+
+      font-weight: 850;
+
+      letter-spacing: -0.04em;
+
+      background:
+        linear-gradient(
+          120deg,
+          #ffffff,
+          #8fdbd1
+        );
+
+      -webkit-background-clip: text;
+      background-clip: text;
+
+      color: transparent;
+    }
+
+    .metric-name {
+      margin-top: 5px;
+
+      color: #8d99b0;
+
+      font-size: 13px;
+
+      text-transform: uppercase;
+
+      letter-spacing: 0.09em;
+    }
+
+    /* =========================
+       SECTIONS
+    ========================= */
+
+    section {
+      padding: 105px 0;
+    }
+
+    .section-header {
+      max-width: 750px;
+
+      margin-bottom: 55px;
+    }
+
+    .section-number {
+      color: #7f73ff;
+
+      font-size: 12px;
+
+      font-weight: 800;
+
+      letter-spacing: 0.15em;
+
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-top: 10px;
+
+      font-size:
+        clamp(32px, 4vw, 52px);
+
+      line-height: 1.05;
+
+      letter-spacing: -0.045em;
+    }
+
+    .section-description {
+      margin-top: 18px;
+
+      color: #98a4ba;
+
+      font-size: 16px;
+    }
+
+    /* =========================
+       PROBLEM
+    ========================= */
+
+    .problem-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(3, 1fr);
+
+      gap: 18px;
+    }
+
+    .glass-card {
+      padding: 28px;
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius: 18px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,0.045),
+          rgba(255,255,255,0.018)
+        );
+    }
+
+    .card-icon {
+      width: 45px;
+      height: 45px;
+
+      display: grid;
+      place-items: center;
+
+      border-radius: 12px;
+
+      background:
+        rgba(109,93,252,0.1);
+
+      margin-bottom: 18px;
+
+      font-size: 20px;
+    }
+
+    .glass-card h3 {
+      font-size: 18px;
+
+      margin-bottom: 10px;
+    }
+
+    .glass-card p {
+      color: #8f9bb1;
+
+      font-size: 14px;
+    }
+
+    /* =========================
+       PIPELINE
+    ========================= */
+
+    .pipeline {
+      display: grid;
+
+      grid-template-columns:
+        repeat(6, 1fr);
+
+      gap: 10px;
+
+      align-items: stretch;
+    }
+
+    .pipeline-step {
+      position: relative;
+
+      padding: 24px 15px;
+
+      text-align: center;
+
+      border:
+        1px solid rgba(255,255,255,0.07);
+
+      border-radius: 15px;
+
+      background:
+        rgba(255,255,255,0.025);
+    }
+
+    .pipeline-step:not(:last-child)::after {
+      content: "→";
+
+      position: absolute;
+
+      right: -17px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      color: #5f6880;
+
+      z-index: 2;
+    }
+
+    .pipeline-number {
+      color: #7d72ff;
+
+      font-size: 11px;
+
+      font-weight: 800;
+    }
+
+    .pipeline-step strong {
+      display: block;
+
+      margin-top: 8px;
+
+      font-size: 13px;
+    }
+
+    .pipeline-step span {
+      display: block;
+
+      margin-top: 6px;
+
+      color: #7f8ba2;
+
+      font-size: 11px;
+    }
+
+    /* =========================
+       ARCHITECTURE
+    ========================= */
+
+    .architecture {
+      padding: 35px;
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius: 22px;
+
+      background:
+        #0b101c;
+
+      overflow-x: auto;
+    }
+
+    .architecture pre {
+      min-width: 760px;
+
+      font-family:
+        "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      color: #aeb8cb;
+
+      font-size: 14px;
+
+      line-height: 1.8;
+    }
+
+    /* =========================
+       RESEARCH
+    ========================= */
+
+    .research-grid {
+      display: grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap: 18px;
+    }
+
+    .research-card {
+      padding: 30px;
+
+      border:
+        1px solid rgba(255,255,255,0.08);
+
+      border-radius: 18px;
+
+      background:
+        rgba(255,255,255,0.03);
+    }
+
+    .research-card h3 {
+      margin-bottom: 14px;
+    }
+
+    .research-card p {
+      color: #8f9bb1;
+
+      font-size: 14px;
+    }
+
+    .research-list {
+      margin-top: 20px;
+
+      list-style: none;
+    }
+
+    .research-list li {
+      padding: 9px 0;
+
+      border-bottom:
+        1px solid rgba(255,255,255,0.05);
+
+      color: #aeb8ca;
+
+      font-size: 14px;
+    }
+
+    .research-list li::before {
+      content: "✓";
+
+      color: #61dec9;
+
+      margin-right: 10px;
+
+      font-weight: 800;
+    }
+
+    /* =========================
+       ROADMAP
+    ========================= */
+
+    .roadmap {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 15px;
+    }
+
+    .roadmap-item {
+      padding: 23px;
+
+      border-left:
+        2px solid #655bf5;
+
+      border-radius: 0 14px 14px 0;
+
+      background:
+        rgba(255,255,255,0.025);
+    }
+
+    .roadmap-item span {
+      color: #7e74ff;
+
+      font-size: 11px;
+
+      font-weight: 800;
+
+      letter-spacing: 0.1em;
+    }
+
+    .roadmap-item h3 {
+      margin-top: 8px;
+
+      font-size: 16px;
+    }
+
+    .roadmap-item p {
+      margin-top: 7px;
+
+      color: #818da5;
+
+      font-size: 12px;
+    }
+
+    /* =========================
+       CTA
+    ========================= */
+
+    .cta {
+      padding: 85px 30px;
+
+      text-align: center;
+
+      border:
+        1px solid rgba(116,108,255,0.18);
+
+      border-radius: 25px;
+
+      background:
+        radial-gradient(
+          circle at top,
+          rgba(104,92,255,0.12),
+          transparent 60%
+        ),
+        rgba(255,255,255,0.025);
+    }
+
+    .cta p {
+      max-width: 650px;
+
+      margin: 18px auto 30px;
+
+      color: #929eb4;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+      margin-top: 100px;
+
+      padding: 45px 0;
+
+      border-top:
+        1px solid rgba(255,255,255,0.07);
+
+      color: #707b91;
+
+      font-size: 13px;
+    }
+
+    .footer-inner {
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+
+      gap: 20px;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 950px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .terminal {
+        transform: none;
+      }
+
+      .metric-grid {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .pipeline {
+        grid-template-columns:
+          repeat(3, 1fr);
+      }
+
+      .pipeline-step:not(:last-child)::after {
+        display: none;
+      }
+
+      .problem-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .roadmap {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 650px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        min-height: auto;
+
+        padding-top: 80px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .hero-description {
+        font-size: 16px;
+      }
+
+      .metric-grid,
+      .pipeline,
+      .research-grid,
+      .roadmap {
+        grid-template-columns: 1fr;
+      }
+
+      .pipeline-step {
+        text-align: left;
+      }
+
+      section {
+        padding: 75px 0;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+
+        align-items: flex-start;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div class="background">
+  <div class="grid"></div>
+</div>
+
+<!-- =========================
+     NAVIGATION
+========================= -->
+
+<nav>
+  <div class="nav-inner">
+
+```
+<a class="brand" href="#">
+  <span class="brand-icon">⌁</span>
+  <span>Log Anomaly AI</span>
+</a>
+
+<div class="nav-links">
+  <a href="#problem">Problem</a>
+  <a href="#methodology">Methodology</a>
+  <a href="#results">Results</a>
+  <a href="#research">Research</a>
+  <a href="#roadmap">Roadmap</a>
+</div>
+```
+
+  </div>
+</nav>
+
+<main>
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+  <div class="container">
+
+```
+<div class="hero-grid">
+
+  <div>
+
+    <div class="eyebrow">
+      <span class="pulse"></span>
+      Research Project 04
+    </div>
+
+    <h1>
+      <span class="gradient-text">
+        NLP-Based
+        Log Anomaly
+        Detection
+      </span>
+    </h1>
+
+    <p class="hero-description">
+      An experimental research framework that transforms
+      unstructured software logs into machine-readable
+      representations and uses NLP and machine learning
+      to identify anomalous events.
+    </p>
+
+    <div class="hero-buttons">
+
+      <a
+        class="btn btn-primary"
+        href="https://github.com/upadrastaharshavardhan/NLP-Based-Log-Anomaly-Detection-NLP"
+        target="_blank"
+        rel="noopener"
+      >
+        View on GitHub →
+      </a>
+
+      <a
+        class="btn btn-secondary"
+        href="#methodology"
+      >
+        Explore Research
+      </a>
+
+    </div>
+
+  </div>
+
+  <div class="terminal">
+
+    <div class="terminal-header">
+
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+
+      <span class="terminal-title">
+        anomaly_detection.py
+      </span>
+
+    </div>
+
+    <div class="terminal-body">
+
+      <div class="code-line">
+        <span class="code-command">$</span>
+        python scripts/generate_data.py
+      </div>
+
+      <div class="code-line">
+        <span class="code-highlight">
+          samples:
+        </span>
+        6000
+      </div>
+
+      <div class="code-line">
+        <span class="code-highlight">
+          seed:
+        </span>
+        42
+      </div>
+
+      <div class="code-line">
+        <span class="code-command">$</span>
+        python scripts/train.py
+      </div>
+
+      <div class="code-line">
+        model training completed
+      </div>
+
+      <div class="code-line">
+        <span class="code-command">$</span>
+        python scripts/evaluate.py
+      </div>
+
+      <div class="code-line code-success">
+        accuracy      96.20%
+      </div>
+
+      <div class="code-line code-success">
+        anomaly F1     0.912
+      </div>
+
+      <div class="code-line code-success">
+        ROC-AUC         0.968
+      </div>
+
+      <div class="code-line code-success">
+        average precision 0.941
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     RESULTS
+========================= -->
+
+<section class="metrics" id="results">
+
+  <div class="container">
+
+```
+<div class="metric-grid">
+
+  <div class="metric">
+    <div class="metric-value">96.20%</div>
+    <div class="metric-name">Accuracy</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-value">0.912</div>
+    <div class="metric-name">Anomaly F1</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-value">0.968</div>
+    <div class="metric-name">ROC-AUC</div>
+  </div>
+
+  <div class="metric">
+    <div class="metric-value">0.941</div>
+    <div class="metric-name">Average Precision</div>
+  </div>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     PROBLEM
+========================= -->
+
+<section id="problem">
+
+  <div class="container">
+
+```
+<div class="section-header">
+
+  <div class="section-number">
+    01 — The Problem
+  </div>
+
+  <h2>
+    Logs contain signals.
+    Finding them manually doesn't scale.
+  </h2>
+
+  <p class="section-description">
+    Modern systems generate huge quantities of textual
+    operational data. Traditional rule-based monitoring
+    can struggle with changing formats, noisy messages,
+    and previously unseen patterns.
+  </p>
+
+</div>
+
+<div class="problem-grid">
+
+  <div class="glass-card">
+
+    <div class="card-icon">📜</div>
+
+    <h3>Unstructured Logs</h3>
+
+    <p>
+      Operational messages contain valuable information
+      but often arrive as semi-structured or natural-language
+      text.
+    </p>
+
+  </div>
+
+  <div class="glass-card">
+
+    <div class="card-icon">⚡</div>
+
+    <h3>Alert Fatigue</h3>
+
+    <p>
+      Excessive false positives can make it difficult for
+      engineers to identify the events that actually matter.
+    </p>
+
+  </div>
+
+  <div class="glass-card">
+
+    <div class="card-icon">🔎</div>
+
+    <h3>Hidden Anomalies</h3>
+
+    <p>
+      Important abnormal behavior may not always match
+      a predefined keyword or static rule.
+    </p>
+
+  </div>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     METHODOLOGY
+========================= -->
+
+<section id="methodology">
+
+  <div class="container">
+
+```
+<div class="section-header">
+
+  <div class="section-number">
+    02 — Methodology
+  </div>
+
+  <h2>
+    From raw text to anomaly intelligence.
+  </h2>
+
+  <p class="section-description">
+    The research pipeline converts log messages into
+    machine-learning representations and evaluates
+    their ability to distinguish normal from anomalous events.
+  </p>
+
+</div>
+
+<div class="pipeline">
+
+  <div class="pipeline-step">
+    <div class="pipeline-number">01</div>
+    <strong>Log Data</strong>
+    <span>Raw events</span>
+  </div>
+
+  <div class="pipeline-step">
+    <div class="pipeline-number">02</div>
+    <strong>Preparation</strong>
+    <span>Clean & label</span>
+  </div>
+
+  <div class="pipeline-step">
+    <div class="pipeline-number">03</div>
+    <strong>NLP</strong>
+    <span>Text representation</span>
+  </div>
+
+  <div class="pipeline-step">
+    <div class="pipeline-number">04</div>
+    <strong>Training</strong>
+    <span>Learn patterns</span>
+  </div>
+
+  <div class="pipeline-step">
+    <div class="pipeline-number">05</div>
+    <strong>Detection</strong>
+    <span>Predict anomalies</span>
+  </div>
+
+  <div class="pipeline-step">
+    <div class="pipeline-number">06</div>
+    <strong>Evaluation</strong>
+    <span>Measure results</span>
+  </div>
+
+</div>
+
+<div style="height: 35px;"></div>
+
+<div class="architecture">
+```
+
+<pre>
+Raw Log Events
+      │
+      ▼
+┌───────────────────────┐
+│ Data Preparation      │
+│ Cleaning / Labeling   │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ NLP Representation    │
+│ Text → Features       │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ ML Training Pipeline  │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ Anomaly Prediction    │
+│ Normal / Anomalous    │
+└───────────┬───────────┘
+            │
+            ▼
+┌───────────────────────┐
+│ Evaluation            │
+│ F1 / ROC-AUC / AP     │
+└───────────────────────┘
+</pre>
+
+```
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     RESEARCH
+========================= -->
+
+<section id="research">
+
+  <div class="container">
+
+```
+<div class="section-header">
+
+  <div class="section-number">
+    03 — Research Package
+  </div>
+
+  <h2>
+    Research and implementation,
+    packaged together.
+  </h2>
+
+  <p class="section-description">
+    The repository is organized so that readers can move
+    from the research paper to the experimental evidence
+    and then reproduce the implementation.
+  </p>
+
+</div>
+
+<div class="research-grid">
+
+  <div class="research-card">
+
+    <h3>📄 Research Paper</h3>
+
+    <p>
+      Complete research documentation covering the
+      problem, methodology, experimentation, results,
+      analysis, and discussion.
+    </p>
+
+    <ul class="research-list">
+      <li>Research methodology</li>
+      <li>Experimental design</li>
+      <li>Results analysis</li>
+      <li>Research discussion</li>
+    </ul>
+
+  </div>
+
+  <div class="research-card">
+
+    <h3>💻 Executable Codebase</h3>
+
+    <p>
+      Reproducible Python implementation containing
+      the data generation, training, and evaluation pipeline.
+    </p>
+
+    <ul class="research-list">
+      <li>Data generation</li>
+      <li>Model training</li>
+      <li>Anomaly prediction</li>
+      <li>Evaluation scripts</li>
+    </ul>
+
+  </div>
+
+  <div class="research-card">
+
+    <h3>📊 Experimental Results</h3>
+
+    <p>
+      Evaluation artifacts provide measurable evidence
+      of the model's anomaly-detection performance.
+    </p>
+
+    <ul class="research-list">
+      <li>Accuracy</li>
+      <li>Anomaly F1</li>
+      <li>ROC-AUC</li>
+      <li>Average Precision</li>
+    </ul>
+
+  </div>
+
+  <div class="research-card">
+
+    <h3>📚 Technical Documentation</h3>
+
+    <p>
+      Supporting documentation explains the methodology,
+      data analysis, experimental results, and research
+      discussion.
+    </p>
+
+    <ul class="research-list">
+      <li>Methodology</li>
+      <li>Data analysis</li>
+      <li>Results</li>
+      <li>Discussion</li>
+    </ul>
+
+  </div>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     APPLICATIONS
+========================= -->
+
+<section>
+
+  <div class="container">
+
+```
+<div class="section-header">
+
+  <div class="section-number">
+    04 — Applications
+  </div>
+
+  <h2>
+    Where this research can be applied.
+  </h2>
+
+</div>
+
+<div class="problem-grid">
+
+  <div class="glass-card">
+    <div class="card-icon">☁️</div>
+    <h3>Cloud Operations</h3>
+    <p>
+      Analyze large volumes of infrastructure and service logs.
+    </p>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-icon">⚙️</div>
+    <h3>DevOps & SRE</h3>
+    <p>
+      Support monitoring, incident investigation, and operational intelligence.
+    </p>
+  </div>
+
+  <div class="glass-card">
+    <div class="card-icon">🛡️</div>
+    <h3>Security Monitoring</h3>
+    <p>
+      Identify unusual textual patterns associated with suspicious activity.
+    </p>
+  </div>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     ROADMAP
+========================= -->
+
+<section id="roadmap">
+
+  <div class="container">
+
+```
+<div class="section-header">
+
+  <div class="section-number">
+    05 — Future Research
+  </div>
+
+  <h2>
+    The next step: from detection to autonomous intelligence.
+  </h2>
+
+  <p class="section-description">
+    Log anomaly detection can become the first layer
+    of a larger AIOps and intelligent incident-analysis system.
+  </p>
+
+</div>
+
+<div class="roadmap">
+
+  <div class="roadmap-item">
+    <span>PHASE 01</span>
+    <h3>Real-World Benchmarks</h3>
+    <p>
+      Evaluate against diverse public and production-style datasets.
+    </p>
+  </div>
+
+  <div class="roadmap-item">
+    <span>PHASE 02</span>
+    <h3>Advanced NLP</h3>
+    <p>
+      Explore contextual language representations and transformer models.
+    </p>
+  </div>
+
+  <div class="roadmap-item">
+    <span>PHASE 03</span>
+    <h3>Temporal Intelligence</h3>
+    <p>
+      Analyze sequences and relationships between log events.
+    </p>
+  </div>
+
+  <div class="roadmap-item">
+    <span>PHASE 04</span>
+    <h3>Autonomous RCA</h3>
+    <p>
+      Connect anomalies with dependencies, incidents, and root causes.
+    </p>
+  </div>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+<!-- =========================
+     CTA
+========================= -->
+
+<section>
+
+  <div class="container">
+
+```
+<div class="cta">
+
+  <div class="section-number">
+    EXPLORE THE RESEARCH
+  </div>
+
+  <h2>
+    Turn logs into intelligence.
+  </h2>
+
+  <p>
+    Explore the complete research package, reproduce
+    the experiments, inspect the implementation, and
+    extend the work toward intelligent AIOps.
+  </p>
+
+  <a
+    class="btn btn-primary"
+    href="https://github.com/upadrastaharshavardhan/NLP-Based-Log-Anomaly-Detection-NLP"
+    target="_blank"
+    rel="noopener"
+  >
+    Open GitHub Repository →
+  </a>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+</main>
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+  <div class="container">
+
+```
+<div class="footer-inner">
+
+  <div>
+    © 2026 Upadrasta Harsha Vardhan
+  </div>
+
+  <div>
+    NLP • Machine Learning • Log Analytics • AIOps
+  </div>
+
+</div>
+```
+
+  </div>
+
+</footer>
+
+</body>
+</html>
